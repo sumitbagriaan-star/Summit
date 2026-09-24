@@ -1,0 +1,1350 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8" />
+<meta name="viewport" content="width=device-width, initial-scale=1.0, viewport-fit=cover" />
+<meta name="color-scheme" content="light" />
+<meta name="theme-color" content="#FAF7F2" />
+<title>Co Founder — AI Website Builder</title>
+<script src="https://cdnjs.cloudflare.com/ajax/libs/react/18.2.0/umd/react.production.min.js"></script>
+<script src="https://cdnjs.cloudflare.com/ajax/libs/react-dom/18.2.0/umd/react-dom.production.min.js"></script>
+<script src="https://cdnjs.cloudflare.com/ajax/libs/babel-standalone/7.23.5/babel.min.js"></script>
+<script src="https://cdn.tailwindcss.com"></script>
+<style>
+  :root { box-sizing: border-box; color-scheme: light; }
+  html, body { height: 100%; margin: 0; background-color: #FAF7F2 !important; }
+  body { padding-top: env(safe-area-inset-top, 0px); padding-bottom: env(safe-area-inset-bottom, 0px); }
+  #root { min-height: 100%; background-color: #FAF7F2; }
+</style>
+</head>
+<body>
+<div id="root"></div>
+<script type="text/babel" data-presets="react">
+const { useState } = React;
+
+const FIELD_STYLE =
+  "w-full px-3 py-2 rounded-md border border-[#D9D2C4] bg-white text-[#2B2823] placeholder-[#A79E8C] focus:outline-none focus:ring-2 focus:ring-[#C9A24B] text-sm";
+
+// Point this at your running backend (see backend/README.md)
+const BACKEND_URL = "https://cofounder-ai-website-builder.onrender.com";
+
+function svgToDataUri(svg) {
+  return "data:image/svg+xml,".concat(encodeURIComponent(svg));
+}
+
+const TEMPLATE_IMAGES = [
+  {
+    id: "bakery",
+    label: "Bakery / Food",
+    svg: `<svg xmlns="http://www.w3.org/2000/svg" width="900" height="360" viewBox="0 0 900 360">
+      <defs><radialGradient id="g1" cx="50%" cy="35%" r="75%"><stop offset="0%" stop-color="#FCF3E3"/><stop offset="100%" stop-color="#F1DDB8"/></radialGradient></defs>
+      <rect width="900" height="360" fill="url(#g1)"/>
+      <circle cx="120" cy="60" r="6" fill="#E8C79A" opacity="0.6"/>
+      <circle cx="780" cy="90" r="9" fill="#C9532F" opacity="0.4"/>
+      <circle cx="200" cy="300" r="5" fill="#C9532F" opacity="0.4"/>
+      <circle cx="700" cy="290" r="7" fill="#E8C79A" opacity="0.6"/>
+      <ellipse cx="450" cy="300" rx="180" ry="18" fill="#8A5A2B" opacity="0.12"/>
+      <path d="M370 260 L385 175 Q450 150 515 175 L530 260 Z" fill="#D9A566"/>
+      <path d="M370 260 L385 175 Q450 150 515 175 L530 260 Z" fill="#000" opacity="0.06"/>
+      <path d="M375 178 Q450 210 525 178 L515 200 Q450 225 385 200 Z" fill="#8A5A2B"/>
+      <path d="M370 165 Q400 105 450 130 Q460 90 500 120 Q520 100 525 150 Q450 145 370 165 Z" fill="#C9532F"/>
+      <path d="M370 165 Q400 105 450 130 Q460 90 500 120 Q520 100 525 150 Q450 145 370 165 Z" fill="#fff" opacity="0.1"/>
+      <circle cx="410" cy="230" r="7" fill="#FCF3E3"/>
+      <circle cx="450" cy="215" r="7" fill="#FCF3E3"/>
+      <circle cx="490" cy="228" r="7" fill="#FCF3E3"/>
+      <circle cx="430" cy="245" r="7" fill="#FCF3E3"/>
+      <circle cx="470" cy="245" r="7" fill="#FCF3E3"/>
+      <path d="M420 100 Q425 80 415 65" stroke="#C9A24B" stroke-width="3" fill="none" opacity="0.5" stroke-linecap="round"/>
+      <path d="M480 100 Q485 78 475 62" stroke="#C9A24B" stroke-width="3" fill="none" opacity="0.5" stroke-linecap="round"/>
+    </svg>`,
+  },
+  {
+    id: "salon",
+    label: "Salon / Beauty",
+    svg: `<svg xmlns="http://www.w3.org/2000/svg" width="900" height="360" viewBox="0 0 900 360">
+      <defs><radialGradient id="g2" cx="50%" cy="35%" r="75%"><stop offset="0%" stop-color="#FAF3F8"/><stop offset="100%" stop-color="#E9D3E4"/></radialGradient></defs>
+      <rect width="900" height="360" fill="url(#g2)"/>
+      <circle cx="150" cy="80" r="7" fill="#6B5B95" opacity="0.3"/>
+      <circle cx="760" cy="70" r="5" fill="#D4537E" opacity="0.4"/>
+      <circle cx="740" cy="300" r="8" fill="#6B5B95" opacity="0.25"/>
+      <ellipse cx="450" cy="300" rx="170" ry="16" fill="#3A2E5C" opacity="0.1"/>
+      <ellipse cx="450" cy="205" rx="95" ry="105" fill="#fff" opacity="0.5"/>
+      <path d="M370 165 Q450 95 530 165 Q535 230 450 250 Q365 230 370 165 Z" fill="#6B5B95"/>
+      <path d="M370 165 Q450 95 530 165 Q535 230 450 250 Q365 230 370 165 Z" fill="#fff" opacity="0.08"/>
+      <circle cx="422" cy="175" r="22" fill="#FAF3F8"/>
+      <circle cx="478" cy="175" r="22" fill="#FAF3F8"/>
+      <circle cx="422" cy="175" r="9" fill="#3A2E5C"/>
+      <circle cx="478" cy="175" r="9" fill="#3A2E5C"/>
+      <path d="M405 215 Q450 245 495 215" stroke="#3A2E5C" stroke-width="8" fill="none" stroke-linecap="round"/>
+      <line x1="450" y1="150" x2="450" y2="235" stroke="#D4537E" stroke-width="4" opacity="0.7"/>
+      <circle cx="450" cy="145" r="6" fill="#D4537E"/>
+      <path d="M610 140 l10 -22 l10 22 l-10 -8 z" fill="#D4537E" opacity="0.6"/>
+      <path d="M270 250 l8 -18 l8 18 l-8 -6 z" fill="#6B5B95" opacity="0.5"/>
+    </svg>`,
+  },
+  {
+    id: "fashion",
+    label: "Fashion / Retail",
+    svg: `<svg xmlns="http://www.w3.org/2000/svg" width="900" height="360" viewBox="0 0 900 360">
+      <defs><radialGradient id="g3" cx="50%" cy="35%" r="75%"><stop offset="0%" stop-color="#F3EFFA"/><stop offset="100%" stop-color="#DCD0EE"/></radialGradient></defs>
+      <rect width="900" height="360" fill="url(#g3)"/>
+      <circle cx="180" cy="70" r="6" fill="#3A2E5C" opacity="0.3"/>
+      <circle cx="720" cy="90" r="8" fill="#D4537E" opacity="0.3"/>
+      <ellipse cx="450" cy="300" rx="160" ry="16" fill="#3A2E5C" opacity="0.1"/>
+      <line x1="450" y1="95" x2="450" y2="115" stroke="#3A2E5C" stroke-width="6" stroke-linecap="round"/>
+      <path d="M450 115 Q400 118 380 140 M450 115 Q500 118 520 140" stroke="#3A2E5C" stroke-width="6" fill="none" stroke-linecap="round"/>
+      <path d="M405 140 L360 260 Q450 285 540 260 L495 140 Q450 165 405 140 Z" fill="#6B5B95"/>
+      <path d="M405 140 L360 260 Q450 285 540 260 L495 140 Q450 165 405 140 Z" fill="#fff" opacity="0.1"/>
+      <path d="M420 145 Q450 195 480 145" stroke="#3A2E5C" stroke-width="5" fill="none" opacity="0.5"/>
+      <circle cx="450" cy="130" r="14" fill="#3A2E5C"/>
+      <g transform="translate(600,190)">
+        <path d="M0 20 L60 20 L55 80 L5 80 Z" fill="#D4537E"/>
+        <path d="M15 20 Q15 0 30 0 Q45 0 45 20" stroke="#3A2E5C" stroke-width="5" fill="none"/>
+      </g>
+    </svg>`,
+  },
+  {
+    id: "grocery",
+    label: "Grocery / Store",
+    svg: `<svg xmlns="http://www.w3.org/2000/svg" width="900" height="360" viewBox="0 0 900 360">
+      <defs><radialGradient id="g4" cx="50%" cy="35%" r="75%"><stop offset="0%" stop-color="#F1F8ED"/><stop offset="100%" stop-color="#CDE6C2"/></radialGradient></defs>
+      <rect width="900" height="360" fill="url(#g4)"/>
+      <circle cx="170" cy="80" r="6" fill="#4B7A5A" opacity="0.35"/>
+      <circle cx="730" cy="70" r="8" fill="#639922" opacity="0.3"/>
+      <ellipse cx="450" cy="300" rx="170" ry="16" fill="#2F5238" opacity="0.1"/>
+      <path d="M380 175 L520 175 L505 260 Q450 275 395 260 Z" fill="#4B7A5A"/>
+      <path d="M380 175 L520 175 L505 260 Q450 275 395 260 Z" fill="#fff" opacity="0.08"/>
+      <path d="M395 175 Q410 130 450 130 Q490 130 505 175" stroke="#2F5238" stroke-width="10" fill="none"/>
+      <ellipse cx="425" cy="200" rx="14" ry="18" fill="#E24B4A"/>
+      <path d="M425 182 Q420 170 415 165" stroke="#2F5238" stroke-width="4" fill="none"/>
+      <ellipse cx="455" cy="205" rx="13" ry="16" fill="#EF9F27"/>
+      <ellipse cx="480" cy="198" rx="12" ry="15" fill="#639922"/>
+      <path d="M480 183 Q478 172 472 166" stroke="#2F5238" stroke-width="3" fill="none"/>
+      <circle cx="415" cy="255" r="9" fill="#2F5238"/>
+      <circle cx="485" cy="255" r="9" fill="#2F5238"/>
+    </svg>`,
+  },
+  {
+    id: "restaurant",
+    label: "Restaurant / Cafe",
+    svg: `<svg xmlns="http://www.w3.org/2000/svg" width="900" height="360" viewBox="0 0 900 360">
+      <defs><radialGradient id="g5" cx="50%" cy="35%" r="75%"><stop offset="0%" stop-color="#FDF1E9"/><stop offset="100%" stop-color="#F0D0BC"/></radialGradient></defs>
+      <rect width="900" height="360" fill="url(#g5)"/>
+      <circle cx="160" cy="80" r="6" fill="#C9532F" opacity="0.3"/>
+      <circle cx="740" cy="90" r="8" fill="#5C3A26" opacity="0.25"/>
+      <ellipse cx="450" cy="300" rx="175" ry="16" fill="#3A1F14" opacity="0.1"/>
+      <circle cx="450" cy="215" r="90" fill="#fff"/>
+      <circle cx="450" cy="215" r="90" fill="#000" opacity="0.03"/>
+      <circle cx="450" cy="215" r="65" fill="none" stroke="#E8B69A" stroke-width="3"/>
+      <circle cx="450" cy="215" r="32" fill="#C9532F"/>
+      <path d="M420 195 Q450 185 480 195 Q470 215 450 210 Q430 215 420 195 Z" fill="#639922" opacity="0.8"/>
+      <g stroke="#5C3A26" stroke-width="5" stroke-linecap="round">
+        <line x1="358" y1="120" x2="358" y2="185"/>
+        <line x1="348" y1="120" x2="348" y2="155"/>
+        <line x1="368" y1="120" x2="368" y2="155"/>
+      </g>
+      <path d="M545 120 Q560 150 545 175" stroke="#5C3A26" stroke-width="5" fill="none" stroke-linecap="round"/>
+      <path d="M225 130 Q230 110 220 95 M255 135 Q262 112 250 95" stroke="#C9A24B" stroke-width="3" fill="none" opacity="0.5" stroke-linecap="round"/>
+    </svg>`,
+  },
+  {
+    id: "general",
+    label: "General / Services",
+    svg: `<svg xmlns="http://www.w3.org/2000/svg" width="900" height="360" viewBox="0 0 900 360">
+      <defs><radialGradient id="g6" cx="50%" cy="35%" r="75%"><stop offset="0%" stop-color="#EEF4FA"/><stop offset="100%" stop-color="#C4D9EA"/></radialGradient></defs>
+      <rect width="900" height="360" fill="url(#g6)"/>
+      <circle cx="170" cy="80" r="6" fill="#2E4E6B" opacity="0.3"/>
+      <circle cx="730" cy="90" r="8" fill="#378ADD" opacity="0.3"/>
+      <ellipse cx="450" cy="300" rx="170" ry="16" fill="#042C53" opacity="0.1"/>
+      <rect x="385" y="175" width="130" height="95" rx="10" fill="#2E4E6B"/>
+      <rect x="385" y="175" width="130" height="95" rx="10" fill="#fff" opacity="0.06"/>
+      <rect x="420" y="150" width="60" height="30" rx="6" fill="#2E4E6B"/>
+      <rect x="428" y="158" width="44" height="14" rx="4" fill="#EEF4FA"/>
+      <rect x="385" y="205" width="130" height="8" fill="#A9C2D9"/>
+      <circle cx="450" cy="230" r="10" fill="#EF9F27"/>
+      <circle cx="600" cy="205" r="26" fill="#378ADD"/>
+      <path d="M590 205 L598 213 L612 195" stroke="#fff" stroke-width="5" fill="none" stroke-linecap="round" stroke-linejoin="round"/>
+      <circle cx="300" cy="205" r="18" fill="#2E4E6B" opacity="0.5"/>
+    </svg>`,
+  },
+];
+
+function AIWebsiteBuilder() {
+  const SECURITY_QUESTIONS = [
+    "What was the name of your first pet?",
+    "What city were you born in?",
+    "What is your favorite food?",
+    "What was the name of your first school?",
+  ];
+
+  const [token, setToken] = useState(null);
+  const [authEmail, setAuthEmail] = useState("");
+  const [authPassword, setAuthPassword] = useState("");
+  const [authMode, setAuthMode] = useState("login"); // "login" | "signup"
+  const [authError, setAuthError] = useState("");
+  const [authFieldErrors, setAuthFieldErrors] = useState({});
+  const [authLoading, setAuthLoading] = useState(false);
+  const [securityQuestion, setSecurityQuestion] = useState(SECURITY_QUESTIONS[0]);
+  const [securityAnswer, setSecurityAnswer] = useState("");
+
+  const [showForgotPassword, setShowForgotPassword] = useState(false);
+  const [forgotStep, setForgotStep] = useState(1); // 1: email, 2: answer+new password
+  const [forgotEmail, setForgotEmail] = useState("");
+  const [forgotQuestion, setForgotQuestion] = useState("");
+  const [forgotAnswer, setForgotAnswer] = useState("");
+  const [forgotNewPassword, setForgotNewPassword] = useState("");
+  const [forgotError, setForgotError] = useState("");
+  const [forgotSuccess, setForgotSuccess] = useState(false);
+  const [forgotLoading, setForgotLoading] = useState(false);
+
+  const [businessName, setBusinessName] = useState("");
+  const [businessType, setBusinessType] = useState("");
+  const [description, setDescription] = useState("");
+  const [heroImage, setHeroImage] = useState(null);
+  const [imageError, setImageError] = useState("");
+  const [language, setLanguage] = useState("english");
+  const [whatsappNumber, setWhatsappNumber] = useState("");
+  const [address, setAddress] = useState("");
+  const [hoursOpen, setHoursOpen] = useState("");
+  const [hoursClose, setHoursClose] = useState("");
+  const [hoursClosedDays, setHoursClosedDays] = useState([]);
+  const [socialInstagram, setSocialInstagram] = useState("");
+  const [socialFacebook, setSocialFacebook] = useState("");
+  const [reviews, setReviews] = useState([]);
+  const [reviewName, setReviewName] = useState("");
+  const [reviewText, setReviewText] = useState("");
+  const [showMessages, setShowMessages] = useState(false);
+  const [messagesList, setMessagesList] = useState([]);
+  const [loadingMessages, setLoadingMessages] = useState(false);
+  const [loading, setLoading] = useState(false);
+  const [error, setError] = useState("");
+  const [variants, setVariants] = useState(null);
+  const [selectedIdx, setSelectedIdx] = useState(0);
+  const [editing, setEditing] = useState(false);
+  const [liveUrl, setLiveUrl] = useState("");
+  const [publishing, setPublishing] = useState(false);
+
+  const [showMySites, setShowMySites] = useState(false);
+  const [mySites, setMySites] = useState([]);
+  const [loadingMySites, setLoadingMySites] = useState(false);
+  const [editingSlug, setEditingSlug] = useState(null);
+  const [deletingSlug, setDeletingSlug] = useState(null);
+
+  const canGenerate = businessName.trim() && businessType.trim() && !loading;
+  const site = variants ? variants[selectedIdx] : null;
+
+  function updateField(path, value) {
+    setVariants((prev) => {
+      const next = prev.map((v) => ({ ...v, services: v.services?.map((s) => ({ ...s })) }));
+      const target = next[selectedIdx];
+      if (path.startsWith("service.")) {
+        const [, idxStr, key] = path.split(".");
+        target.services[Number(idxStr)][key] = value;
+      } else {
+        target[path] = value;
+      }
+      return next;
+    });
+  }
+
+  function validateAuthFields() {
+    const errs = {};
+    if (!/^[^\s@]+@[^\s@]+\.[^\s@]+$/.test(authEmail.trim())) {
+      errs.email = "Enter a valid email address";
+    }
+    if (authMode === "signup") {
+      if (authPassword.length < 8 || !/[0-9]/.test(authPassword) || !/[a-zA-Z]/.test(authPassword)) {
+        errs.password = "At least 8 characters, with a letter and a number";
+      }
+      if (!securityAnswer.trim()) {
+        errs.securityAnswer = "Please answer the security question (used to reset your password)";
+      }
+    } else if (!authPassword) {
+      errs.password = "Enter your password";
+    }
+    setAuthFieldErrors(errs);
+    return Object.keys(errs).length === 0;
+  }
+
+  async function handleAuthSubmit() {
+    if (!validateAuthFields()) return;
+    setAuthLoading(true);
+    setAuthError("");
+    try {
+      const endpoint = authMode === "login" ? "/api/auth/login" : "/api/auth/signup";
+      const body =
+        authMode === "login"
+          ? { email: authEmail, password: authPassword }
+          : { email: authEmail, password: authPassword, securityQuestion, securityAnswer };
+      const response = await fetch(`${BACKEND_URL}${endpoint}`, {
+        method: "POST",
+        headers: { "Content-Type": "application/json" },
+        body: JSON.stringify(body),
+      });
+      const data = await response.json();
+      if (data.error) throw new Error(data.error);
+      setToken(data.token);
+    } catch (e) {
+      setAuthError(e.message || "Something went wrong");
+    } finally {
+      setAuthLoading(false);
+    }
+  }
+
+  async function fetchSecurityQuestion() {
+    setForgotError("");
+    setForgotLoading(true);
+    try {
+      const response = await fetch(
+        `${BACKEND_URL}/api/auth/security-question?email=${encodeURIComponent(forgotEmail)}`
+      );
+      const data = await response.json();
+      if (data.error) throw new Error(data.error);
+      setForgotQuestion(data.securityQuestion);
+      setForgotStep(2);
+    } catch (e) {
+      setForgotError(e.message || "Couldn't find that account");
+    } finally {
+      setForgotLoading(false);
+    }
+  }
+
+  async function submitPasswordReset() {
+    setForgotError("");
+    if (forgotNewPassword.length < 8 || !/[0-9]/.test(forgotNewPassword) || !/[a-zA-Z]/.test(forgotNewPassword)) {
+      setForgotError("New password needs at least 8 characters, with a letter and a number");
+      return;
+    }
+    setForgotLoading(true);
+    try {
+      const response = await fetch(`${BACKEND_URL}/api/auth/reset-password`, {
+        method: "POST",
+        headers: { "Content-Type": "application/json" },
+        body: JSON.stringify({ email: forgotEmail, securityAnswer: forgotAnswer, newPassword: forgotNewPassword }),
+      });
+      const data = await response.json();
+      if (data.error) throw new Error(data.error);
+      setForgotSuccess(true);
+    } catch (e) {
+      setForgotError(e.message || "Couldn't reset password");
+    } finally {
+      setForgotLoading(false);
+    }
+  }
+
+  function closeForgotPassword() {
+    setShowForgotPassword(false);
+    setForgotStep(1);
+    setForgotEmail("");
+    setForgotQuestion("");
+    setForgotAnswer("");
+    setForgotNewPassword("");
+    setForgotError("");
+    setForgotSuccess(false);
+  }
+
+  function handleImageSelect(file) {
+    setImageError("");
+    if (!file) return;
+    if (!file.type.startsWith("image/")) {
+      setImageError("Please select an image file");
+      return;
+    }
+    const reader = new FileReader();
+    reader.onload = (e) => {
+      const img = new Image();
+      img.onload = () => {
+        const canvas = document.createElement("canvas");
+        const maxWidth = 900;
+        const scale = Math.min(1, maxWidth / img.width);
+        canvas.width = img.width * scale;
+        canvas.height = img.height * scale;
+        const ctx = canvas.getContext("2d");
+        ctx.drawImage(img, 0, 0, canvas.width, canvas.height);
+        const dataUrl = canvas.toDataURL("image/jpeg", 0.75);
+        if (dataUrl.length > 1_500_000) {
+          setImageError("Image is too large even after compression. Try a smaller photo.");
+          return;
+        }
+        setHeroImage(dataUrl);
+      };
+      img.src = e.target.result;
+    };
+    reader.readAsDataURL(file);
+  }
+
+  function toggleClosedDay(day) {
+    setHoursClosedDays((prev) => (prev.includes(day) ? prev.filter((d) => d !== day) : [...prev, day]));
+  }
+
+  function addReview() {
+    if (!reviewName.trim() || !reviewText.trim()) return;
+    setReviews((prev) => [...prev, { name: reviewName.trim(), text: reviewText.trim() }]);
+    setReviewName("");
+    setReviewText("");
+  }
+
+  function removeReview(idx) {
+    setReviews((prev) => prev.filter((_, i) => i !== idx));
+  }
+
+  async function openMessagesForSite(slug) {
+    setShowMessages(true);
+    setLoadingMessages(true);
+    try {
+      const response = await fetch(`${BACKEND_URL}/api/sites/${slug}/messages`, {
+        headers: { Authorization: `Bearer ${token}` },
+      });
+      const data = await response.json();
+      setMessagesList(Array.isArray(data) ? data : []);
+    } catch (e) {
+      setMessagesList([]);
+    } finally {
+      setLoadingMessages(false);
+    }
+  }
+
+  function logout() {
+    setToken(null);
+    setVariants(null);
+    setLiveUrl("");
+  }
+
+  async function fetchMySites() {
+    setLoadingMySites(true);
+    try {
+      const response = await fetch(`${BACKEND_URL}/api/sites`, {
+        headers: { Authorization: `Bearer ${token}` },
+      });
+      const data = await response.json();
+      setMySites(Array.isArray(data) ? data : []);
+    } catch (e) {
+      setMySites([]);
+    } finally {
+      setLoadingMySites(false);
+    }
+  }
+
+  function openMySites() {
+    setShowMySites(true);
+    fetchMySites();
+  }
+
+  function openSiteForEdit(record) {
+    setEditingSlug(record.slug);
+    setBusinessName(record.businessName);
+    setBusinessType("");
+    setDescription("");
+    setVariants([record.siteData]);
+    setSelectedIdx(0);
+    setHeroImage(record.siteData.heroImage || null);
+    setWhatsappNumber(record.siteData.whatsappNumber || "");
+    setAddress(record.siteData.address || "");
+    setHoursOpen((record.siteData.hours && record.siteData.hours.open) || "");
+    setHoursClose((record.siteData.hours && record.siteData.hours.close) || "");
+    setHoursClosedDays((record.siteData.hours && record.siteData.hours.closedDays) || []);
+    setSocialInstagram(record.siteData.socialInstagram || "");
+    setSocialFacebook(record.siteData.socialFacebook || "");
+    setReviews(record.siteData.reviews || []);
+    setLiveUrl(`${BACKEND_URL}/site/${record.slug}`);
+    setShowMySites(false);
+  }
+
+  async function deleteSite(slug) {
+    setDeletingSlug(slug);
+    try {
+      await fetch(`${BACKEND_URL}/api/sites/${slug}`, {
+        method: "DELETE",
+        headers: { Authorization: `Bearer ${token}` },
+      });
+      setMySites((prev) => prev.filter((s) => s.slug !== slug));
+      if (editingSlug === slug) {
+        setEditingSlug(null);
+        setVariants(null);
+        setLiveUrl("");
+      }
+    } catch (e) {
+      // silently ignore, list stays as-is
+    } finally {
+      setDeletingSlug(null);
+    }
+  }
+
+  function startNewSite() {
+    setEditingSlug(null);
+    setBusinessName("");
+    setBusinessType("");
+    setDescription("");
+    setVariants(null);
+    setLiveUrl("");
+    setError("");
+    setHeroImage(null);
+    setImageError("");
+    setWhatsappNumber("");
+    setAddress("");
+    setHoursOpen("");
+    setHoursClose("");
+    setHoursClosedDays([]);
+    setSocialInstagram("");
+    setSocialFacebook("");
+    setReviews([]);
+  }
+
+  async function publishToBackend() {
+    if (!site) return;
+    setPublishing(true);
+    setLiveUrl("");
+    try {
+      const isEdit = Boolean(editingSlug);
+      const url = isEdit ? `${BACKEND_URL}/api/sites/${editingSlug}` : `${BACKEND_URL}/api/sites`;
+      const siteDataToSend = {
+        ...site,
+        heroImage: heroImage || null,
+        whatsappNumber: whatsappNumber || null,
+        address: address || null,
+        hours: hoursOpen && hoursClose ? { open: hoursOpen, close: hoursClose, closedDays: hoursClosedDays } : null,
+        socialInstagram: socialInstagram || null,
+        socialFacebook: socialFacebook || null,
+        reviews,
+      };
+      const response = await fetch(url, {
+        method: isEdit ? "PUT" : "POST",
+        headers: {
+          "Content-Type": "application/json",
+          Authorization: `Bearer ${token}`,
+        },
+        body: JSON.stringify({ businessName, siteData: siteDataToSend }),
+      });
+      const data = await response.json();
+      if (data.error) throw new Error(data.error);
+      const slug = isEdit ? editingSlug : data.slug;
+      setLiveUrl(`${BACKEND_URL}/site/${slug}`);
+    } catch (e) {
+      setError("Couldn't publish. Is the backend server running?");
+    } finally {
+      setPublishing(false);
+    }
+  }
+
+  function exportSiteHTML() {
+    if (!site) return;
+    const servicesHTML = (site.services || [])
+      .map(
+        (s) => `<div style="text-align:center;flex:1;min-width:150px;">
+          <h3 style="font-family:Georgia,serif;font-size:16px;margin-bottom:4px;color:${mood.dark}">${s.name}</h3>
+          <p style="font-size:13px;opacity:0.7;color:${mood.dark}">${s.desc}</p>
+        </div>`
+      )
+      .join("");
+
+    const html = `<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8" />
+<title>${businessName}</title>
+<meta name="viewport" content="width=device-width, initial-scale=1.0" />
+</head>
+<body style="margin:0;font-family:-apple-system,sans-serif;background:${mood.bg}">
+  <div style="padding:80px 40px;text-align:center;color:${mood.dark}">
+    <p style="font-size:13px;letter-spacing:0.5px;font-weight:500;color:${mood.accent};margin-bottom:12px">${businessName}</p>
+    <h1 style="font-family:Georgia,serif;font-size:36px;font-weight:400;margin-bottom:16px">${site.tagline}</h1>
+    <p style="font-size:15px;max-width:500px;margin:0 auto 24px;opacity:0.8">${site.hero_description}</p>
+    <button style="padding:10px 22px;border-radius:6px;border:none;background:${mood.accent};color:white;font-size:14px;font-weight:500;cursor:pointer">${site.cta}</button>
+  </div>
+  <div style="padding:40px;background:rgba(255,255,255,0.5)">
+    <div style="display:flex;gap:24px;flex-wrap:wrap;justify-content:center;max-width:800px;margin:0 auto">
+      ${servicesHTML}
+    </div>
+  </div>
+  <div style="padding:40px;text-align:center;color:${mood.dark}">
+    <h2 style="font-family:Georgia,serif;font-size:22px;margin-bottom:12px">About us</h2>
+    <p style="font-size:14px;max-width:600px;margin:0 auto;opacity:0.8">${site.about}</p>
+  </div>
+  <div style="padding:32px;text-align:center;background:${mood.dark};color:${mood.bg}">
+    <p style="font-size:14px">${site.contact_line}</p>
+  </div>
+</body>
+</html>`;
+
+    const blob = new Blob([html], { type: "text/html" });
+    const url = URL.createObjectURL(blob);
+    const a = document.createElement("a");
+    a.href = url;
+    a.download = `${businessName.trim().replace(/\s+/g, "-").toLowerCase() || "site"}.html`;
+    a.click();
+    URL.revokeObjectURL(url);
+  }
+
+  const EditableText = ({ value, onChange, className, style, tag = "p" }) => {
+    const Tag = tag;
+    if (!editing) return <Tag className={className} style={style}>{value}</Tag>;
+    return (
+      <Tag
+        className={className}
+        style={{ ...style, outline: "none", borderBottom: "1px dashed currentColor", cursor: "text" }}
+        contentEditable
+        suppressContentEditableWarning
+        onBlur={(e) => onChange(e.currentTarget.textContent)}
+      >
+        {value}
+      </Tag>
+    );
+  };
+
+  async function generateSite() {
+    setLoading(true);
+    setError("");
+    setVariants(null);
+    setEditingSlug(null);
+    setHeroImage(null);
+    try {
+      const prompt = `You are generating website copy for a small business. Return ONLY raw JSON, no markdown fences, no preamble.
+
+Business name: ${businessName}
+Business type: ${businessType}
+Extra details from owner: ${description || "none provided"}
+
+Generate 3 DIFFERENT design directions for this business's website. Each should feel distinct in tone/mood (e.g. one warm and cozy, one modern and minimal, one bold and energetic) while staying true to the business. Vary the tagline style, the about tone, and the accent_mood across the three.
+
+Return JSON with this exact shape (an array of exactly 3 items):
+[
+  {
+    "style_label": "short 2-3 word label describing this direction, e.g. 'Warm & Rustic'",
+    "tagline": "short punchy tagline, under 8 words",
+    "hero_description": "1-2 sentence welcoming description of the business",
+    "services": [
+      {"name": "service or product name", "desc": "one short sentence"},
+      {"name": "...", "desc": "..."},
+      {"name": "...", "desc": "..."}
+    ],
+    "about": "2-3 sentence about section written warmly, in first person plural (we/our)",
+    "cta": "short call to action button text, 2-4 words",
+    "contact_line": "one short inviting sentence encouraging visitors to reach out",
+    "accent_mood": "one of: warm, fresh, elegant, bold, earthy"
+  },
+  { ... second variant, different direction ... },
+  { ... third variant, different direction ... }
+]`;
+
+      const response = await fetch(`${BACKEND_URL}/api/generate`, {
+        method: "POST",
+        headers: {
+          "Content-Type": "application/json",
+          Authorization: `Bearer ${token}`,
+        },
+        body: JSON.stringify({ businessName, businessType, description, language }),
+      });
+
+      const data = await response.json();
+      if (data.error) throw new Error(data.error);
+      setVariants(data.variants);
+      setSelectedIdx(0);
+    } catch (e) {
+      setError("Couldn't generate the site. Try again in a moment.");
+    } finally {
+      setLoading(false);
+    }
+  }
+
+  const moodColors = {
+    warm: { bg: "#FBF4EC", accent: "#C9A24B", dark: "#4A3A20" },
+    fresh: { bg: "#F2F7F1", accent: "#4B7A5A", dark: "#1F3A2E" },
+    elegant: { bg: "#F6F5F8", accent: "#6B5B95", dark: "#2E2640" },
+    bold: { bg: "#FFF3F0", accent: "#C9532F", dark: "#3A1F14" },
+    earthy: { bg: "#F5F1E8", accent: "#8A6B4E", dark: "#3A2E1F" },
+    ocean: { bg: "#EEF6F8", accent: "#2E7D9E", dark: "#123240" },
+    sunset: { bg: "#FFF2E5", accent: "#E0793C", dark: "#5C2E12" },
+    mono: { bg: "#F4F4F4", accent: "#333333", dark: "#111111" },
+    blush: { bg: "#FDF1F4", accent: "#D4537E", dark: "#4A1F2C" },
+  };
+  const mood = moodColors[site?.accent_mood] || moodColors.warm;
+
+  if (!token) {
+    return (
+      <div className="min-h-screen w-full bg-[#FAF7F2] flex items-center justify-center p-6">
+        <div className="w-full max-w-sm bg-white rounded-lg border border-[#E5DFD1] p-6">
+          <h1 className="text-lg font-semibold text-[#1F3A2E] mb-1">
+            {authMode === "login" ? "Log in" : "Create an account"}
+          </h1>
+          <p className="text-sm text-[#6B6455] mb-5">
+            {authMode === "login"
+              ? "Log in to manage your sites."
+              : "Sign up to start building your website."}
+          </p>
+
+          <div className="flex flex-col gap-3">
+            <div>
+              <input
+                className={FIELD_STYLE}
+                type="email"
+                placeholder="Email"
+                value={authEmail}
+                onChange={(e) => setAuthEmail(e.target.value)}
+              />
+              {authFieldErrors.email && (
+                <p className="text-xs text-[#B23B3B] mt-1">{authFieldErrors.email}</p>
+              )}
+            </div>
+            <div>
+              <input
+                className={FIELD_STYLE}
+                type="password"
+                placeholder="Password"
+                value={authPassword}
+                onChange={(e) => setAuthPassword(e.target.value)}
+              />
+              {authFieldErrors.password && (
+                <p className="text-xs text-[#B23B3B] mt-1">{authFieldErrors.password}</p>
+              )}
+              {authMode === "login" && (
+                <button
+                  onClick={() => setShowForgotPassword(true)}
+                  className="text-xs text-[#6B5B95] underline mt-1"
+                >
+                  Forgot password?
+                </button>
+              )}
+            </div>
+
+            {authMode === "signup" && (
+              <div>
+                <label className="text-xs font-medium text-[#6B6455] block mb-1">
+                  Security question (for password reset)
+                </label>
+                <select
+                  className={FIELD_STYLE + " mb-2"}
+                  value={securityQuestion}
+                  onChange={(e) => setSecurityQuestion(e.target.value)}
+                >
+                  {SECURITY_QUESTIONS.map((q) => (
+                    <option key={q} value={q}>
+                      {q}
+                    </option>
+                  ))}
+                </select>
+                <input
+                  className={FIELD_STYLE}
+                  placeholder="Your answer"
+                  value={securityAnswer}
+                  onChange={(e) => setSecurityAnswer(e.target.value)}
+                />
+                {authFieldErrors.securityAnswer && (
+                  <p className="text-xs text-[#B23B3B] mt-1">{authFieldErrors.securityAnswer}</p>
+                )}
+              </div>
+            )}
+
+            {authError && <p className="text-sm text-[#B23B3B]">{authError}</p>}
+            <button
+              onClick={handleAuthSubmit}
+              disabled={authLoading || !authEmail || !authPassword}
+              className="py-2.5 rounded-md bg-[#1F3A2E] text-white text-sm font-medium disabled:opacity-40 hover:bg-[#16291F] transition-colors"
+            >
+              {authLoading ? "Please wait..." : authMode === "login" ? "Log in" : "Sign up"}
+            </button>
+          </div>
+
+          <button
+            onClick={() => {
+              setAuthMode((m) => (m === "login" ? "signup" : "login"));
+              setAuthError("");
+              setAuthFieldErrors({});
+            }}
+            className="mt-4 text-sm text-[#6B6455] underline"
+          >
+            {authMode === "login" ? "New here? Create an account" : "Already have an account? Log in"}
+          </button>
+        </div>
+
+        {showForgotPassword && (
+          <div className="fixed inset-0 bg-black/40 flex items-center justify-center p-4 z-50">
+            <div className="bg-white rounded-lg w-full max-w-sm p-5">
+              <div className="flex items-center justify-between mb-3">
+                <h2 className="font-semibold text-[#1F3A2E]">Reset password</h2>
+                <button onClick={closeForgotPassword} className="text-sm text-[#A79E8C]">
+                  Close
+                </button>
+              </div>
+
+              {forgotSuccess ? (
+                <div className="flex flex-col gap-3">
+                  <p className="text-sm text-[#1F3A2E]">
+                    Your password has been reset. You can now log in with your new password.
+                  </p>
+                  <button
+                    onClick={closeForgotPassword}
+                    className="py-2 rounded-md bg-[#1F3A2E] text-white text-sm font-medium"
+                  >
+                    Back to login
+                  </button>
+                </div>
+              ) : forgotStep === 1 ? (
+                <div className="flex flex-col gap-3">
+                  <p className="text-sm text-[#6B6455]">Enter your account email to continue.</p>
+                  <input
+                    className={FIELD_STYLE}
+                    type="email"
+                    placeholder="Email"
+                    value={forgotEmail}
+                    onChange={(e) => setForgotEmail(e.target.value)}
+                  />
+                  {forgotError && <p className="text-xs text-[#B23B3B]">{forgotError}</p>}
+                  <button
+                    onClick={fetchSecurityQuestion}
+                    disabled={forgotLoading || !forgotEmail}
+                    className="py-2 rounded-md bg-[#1F3A2E] text-white text-sm font-medium disabled:opacity-40"
+                  >
+                    {forgotLoading ? "Checking..." : "Continue"}
+                  </button>
+                </div>
+              ) : (
+                <div className="flex flex-col gap-3">
+                  <p className="text-sm text-[#1F3A2E] font-medium">{forgotQuestion}</p>
+                  <input
+                    className={FIELD_STYLE}
+                    placeholder="Your answer"
+                    value={forgotAnswer}
+                    onChange={(e) => setForgotAnswer(e.target.value)}
+                  />
+                  <input
+                    className={FIELD_STYLE}
+                    type="password"
+                    placeholder="New password"
+                    value={forgotNewPassword}
+                    onChange={(e) => setForgotNewPassword(e.target.value)}
+                  />
+                  {forgotError && <p className="text-xs text-[#B23B3B]">{forgotError}</p>}
+                  <button
+                    onClick={submitPasswordReset}
+                    disabled={forgotLoading || !forgotAnswer || !forgotNewPassword}
+                    className="py-2 rounded-md bg-[#1F3A2E] text-white text-sm font-medium disabled:opacity-40"
+                  >
+                    {forgotLoading ? "Please wait..." : "Reset password"}
+                  </button>
+                </div>
+              )}
+            </div>
+          </div>
+        )}
+      </div>
+    );
+  }
+
+  return (
+    <div className="min-h-screen w-full bg-[#FAF7F2] flex flex-col md:flex-row">
+      {/* LEFT: tool UI */}
+      <div className="md:w-[380px] w-full border-b md:border-b-0 md:border-r border-[#E5DFD1] p-6 flex flex-col gap-4">
+        <div>
+          <div className="flex items-center justify-between">
+            <h1 className="text-lg font-semibold text-[#1F3A2E]">
+              {editingSlug ? "Edit your site" : "Build your site"}
+            </h1>
+            <div className="flex items-center gap-3">
+              <button onClick={openMySites} className="text-xs text-[#1F3A2E] underline font-medium">
+                My Sites
+              </button>
+              <button onClick={logout} className="text-xs text-[#A79E8C] underline">
+                Log out
+              </button>
+            </div>
+          </div>
+          <p className="text-sm text-[#6B6455] mt-1">
+            {editingSlug
+              ? "Editing an existing site. Update details and publish to save changes."
+              : "Tell us about your business. We'll generate a starting website."}
+          </p>
+          {editingSlug && (
+            <button onClick={startNewSite} className="text-xs text-[#6B6455] underline mt-1 text-left w-fit">
+              ← Start a new site instead
+            </button>
+          )}
+        </div>
+
+        <div className="flex flex-col gap-1">
+          <label className="text-xs font-medium text-[#6B6455]">Business name</label>
+          <input
+            className={FIELD_STYLE}
+            placeholder="e.g. Riverstone Bakery"
+            value={businessName}
+            onChange={(e) => setBusinessName(e.target.value)}
+          />
+        </div>
+
+        <div className="flex flex-col gap-1">
+          <label className="text-xs font-medium text-[#6B6455]">Type of business</label>
+          <input
+            className={FIELD_STYLE}
+            placeholder="e.g. neighborhood bakery"
+            value={businessType}
+            onChange={(e) => setBusinessType(e.target.value)}
+          />
+        </div>
+
+        <div className="flex flex-col gap-1">
+          <label className="text-xs font-medium text-[#6B6455]">
+            Anything else? <span className="text-[#A79E8C]">(optional)</span>
+          </label>
+          <textarea
+            className={FIELD_STYLE + " min-h-[90px] resize-none"}
+            placeholder="e.g. we do custom cakes, family run since 2010"
+            value={description}
+            onChange={(e) => setDescription(e.target.value)}
+          />
+        </div>
+
+        <div className="flex flex-col gap-1">
+          <label className="text-xs font-medium text-[#6B6455]">
+            Business photo <span className="text-[#A79E8C]">(optional)</span>
+          </label>
+          {heroImage ? (
+            <div className="relative">
+              <img src={heroImage} alt="preview" className="w-full h-32 object-cover rounded-md border border-[#D9D2C4]" />
+              <button
+                onClick={() => setHeroImage(null)}
+                className="absolute top-1 right-1 bg-white/90 text-xs px-2 py-1 rounded text-[#B23B3B] font-medium"
+              >
+                Remove
+              </button>
+            </div>
+          ) : (
+            <>
+              <label className="flex items-center justify-center border border-dashed border-[#D9D2C4] rounded-md py-4 text-xs text-[#A79E8C] cursor-pointer hover:bg-white/40">
+                Tap to upload a photo
+                <input
+                  type="file"
+                  accept="image/*"
+                  className="hidden"
+                  onChange={(e) => handleImageSelect(e.target.files?.[0])}
+                />
+              </label>
+              <p className="text-xs text-[#A79E8C] mt-2 mb-1">Or pick a template image:</p>
+              <div className="flex gap-2 overflow-x-auto pb-1">
+                {TEMPLATE_IMAGES.map((t) => (
+                  <button
+                    key={t.id}
+                    onClick={() => setHeroImage(svgToDataUri(t.svg))}
+                    className="flex-none w-20 flex flex-col items-center gap-1"
+                    title={t.label}
+                  >
+                    <img
+                      src={svgToDataUri(t.svg)}
+                      alt={t.label}
+                      className="w-20 h-14 object-cover rounded border border-[#D9D2C4] hover:border-[#C9A24B]"
+                    />
+                    <span className="text-[10px] text-[#6B6455] text-center leading-tight">{t.label}</span>
+                  </button>
+                ))}
+              </div>
+            </>
+          )}
+          {imageError && <p className="text-xs text-[#B23B3B]">{imageError}</p>}
+        </div>
+
+        <div className="flex flex-col gap-1">
+          <label className="text-xs font-medium text-[#6B6455]">Website language</label>
+          <select className={FIELD_STYLE} value={language} onChange={(e) => setLanguage(e.target.value)}>
+            <option value="english">English</option>
+            <option value="hindi">Hindi (हिंदी)</option>
+          </select>
+        </div>
+
+        <details className="border border-[#E5DFD1] rounded-md">
+          <summary className="px-3 py-2 text-xs font-medium text-[#1F3A2E] cursor-pointer select-none">
+            More details (WhatsApp, address, hours, socials, reviews)
+          </summary>
+          <div className="flex flex-col gap-3 p-3 pt-0">
+            <div>
+              <label className="text-xs font-medium text-[#6B6455] block mb-1">WhatsApp number</label>
+              <input
+                className={FIELD_STYLE}
+                placeholder="e.g. 919876543210 (with country code)"
+                value={whatsappNumber}
+                onChange={(e) => setWhatsappNumber(e.target.value)}
+              />
+            </div>
+
+            <div>
+              <label className="text-xs font-medium text-[#6B6455] block mb-1">Address (for map)</label>
+              <input
+                className={FIELD_STYLE}
+                placeholder="Shop address, area, city"
+                value={address}
+                onChange={(e) => setAddress(e.target.value)}
+              />
+            </div>
+
+            <div>
+              <label className="text-xs font-medium text-[#6B6455] block mb-1">Business hours</label>
+              <div className="flex gap-2">
+                <input
+                  type="time"
+                  className={FIELD_STYLE}
+                  value={hoursOpen}
+                  onChange={(e) => setHoursOpen(e.target.value)}
+                />
+                <input
+                  type="time"
+                  className={FIELD_STYLE}
+                  value={hoursClose}
+                  onChange={(e) => setHoursClose(e.target.value)}
+                />
+              </div>
+              <div className="flex flex-wrap gap-2 mt-2">
+                {["Sun", "Mon", "Tue", "Wed", "Thu", "Fri", "Sat"].map((day) => (
+                  <button
+                    key={day}
+                    type="button"
+                    onClick={() => toggleClosedDay(day)}
+                    className={`text-[10px] px-2 py-1 rounded border ${
+                      hoursClosedDays.includes(day)
+                        ? "bg-[#B23B3B] text-white border-[#B23B3B]"
+                        : "border-[#D9D2C4] text-[#6B6455]"
+                    }`}
+                  >
+                    {day}
+                  </button>
+                ))}
+              </div>
+              <p className="text-[10px] text-[#A79E8C] mt-1">Tap days you're closed</p>
+            </div>
+
+            <div>
+              <label className="text-xs font-medium text-[#6B6455] block mb-1">Instagram link</label>
+              <input
+                className={FIELD_STYLE}
+                placeholder="https://instagram.com/yourbusiness"
+                value={socialInstagram}
+                onChange={(e) => setSocialInstagram(e.target.value)}
+              />
+            </div>
+            <div>
+              <label className="text-xs font-medium text-[#6B6455] block mb-1">Facebook link</label>
+              <input
+                className={FIELD_STYLE}
+                placeholder="https://facebook.com/yourbusiness"
+                value={socialFacebook}
+                onChange={(e) => setSocialFacebook(e.target.value)}
+              />
+            </div>
+
+            <div>
+              <label className="text-xs font-medium text-[#6B6455] block mb-1">Customer reviews</label>
+              {reviews.map((r, i) => (
+                <div key={i} className="flex items-start justify-between gap-2 bg-white/60 rounded p-2 mb-1">
+                  <div>
+                    <p className="text-xs font-medium text-[#1F3A2E]">{r.name}</p>
+                    <p className="text-xs text-[#6B6455]">{r.text}</p>
+                  </div>
+                  <button onClick={() => removeReview(i)} className="text-[10px] text-[#B23B3B] flex-none">
+                    Remove
+                  </button>
+                </div>
+              ))}
+              <input
+                className={FIELD_STYLE + " mb-1"}
+                placeholder="Customer name"
+                value={reviewName}
+                onChange={(e) => setReviewName(e.target.value)}
+              />
+              <textarea
+                className={FIELD_STYLE + " mb-1"}
+                placeholder="What they said"
+                value={reviewText}
+                onChange={(e) => setReviewText(e.target.value)}
+              />
+              <button
+                type="button"
+                onClick={addReview}
+                className="text-xs py-1.5 rounded border border-[#1F3A2E] text-[#1F3A2E] font-medium"
+              >
+                + Add review
+              </button>
+            </div>
+          </div>
+        </details>
+
+        <button
+          onClick={generateSite}
+          disabled={!canGenerate}
+          className="mt-1 py-2.5 rounded-md bg-[#1F3A2E] text-white text-sm font-medium disabled:opacity-40 disabled:cursor-not-allowed hover:bg-[#16291F] transition-colors"
+        >
+          {loading ? "Generating..." : "Generate website"}
+        </button>
+
+        {error && <p className="text-sm text-[#B23B3B]">{error}</p>}
+
+        <p className="text-xs text-[#A79E8C] mt-auto pt-4">
+          Prototype — "Publish" downloads a standalone HTML file. Real one-click hosting/domain setup would be a backend feature.
+        </p>
+      </div>
+
+      {/* RIGHT: generated site preview */}
+      <div className="flex-1 p-6 md:p-10 overflow-auto">
+        {!variants && !loading && (
+          <div className="h-full flex items-center justify-center text-center">
+            <p className="text-[#A79E8C] text-sm max-w-xs">
+              Fill in your business details and generate to see 3 website design options here.
+            </p>
+          </div>
+        )}
+
+        {loading && (
+          <div className="h-full flex items-center justify-center">
+            <p className="text-[#6B6455] text-sm">Writing 3 design directions...</p>
+          </div>
+        )}
+
+        {variants && (
+          <div className="flex gap-2 mb-5 items-center flex-wrap">
+            {variants.map((v, i) => (
+              <button
+                key={i}
+                onClick={() => setSelectedIdx(i)}
+                className={
+                  "px-4 py-2 rounded-md text-sm font-medium border transition-colors " +
+                  (i === selectedIdx
+                    ? "bg-[#1F3A2E] text-white border-[#1F3A2E]"
+                    : "bg-white text-[#6B6455] border-[#E5DFD1] hover:border-[#C9A24B]")
+                }
+              >
+                {v.style_label || `Option ${i + 1}`}
+              </button>
+            ))}
+            <button
+              onClick={() => setEditing((e) => !e)}
+              className={
+                "px-4 py-2 rounded-md text-sm font-medium border transition-colors " +
+                (editing
+                  ? "bg-[#C9A24B] text-white border-[#C9A24B]"
+                  : "bg-white text-[#6B6455] border-[#E5DFD1] hover:border-[#C9A24B]")
+              }
+            >
+              {editing ? "Done editing" : "Edit text"}
+            </button>
+            <button
+              onClick={publishToBackend}
+              disabled={publishing}
+              className="ml-auto px-4 py-2 rounded-md text-sm font-medium bg-[#1F3A2E] text-white hover:bg-[#16291F] transition-colors disabled:opacity-50"
+            >
+              {publishing ? "Publishing..." : "Publish live"}
+            </button>
+            <button
+              onClick={exportSiteHTML}
+              className="px-4 py-2 rounded-md text-sm font-medium border border-[#E5DFD1] text-[#6B6455] hover:border-[#C9A24B] transition-colors"
+            >
+              Download HTML
+            </button>
+          </div>
+        )}
+
+        {liveUrl && (
+          <div className="mb-5 px-4 py-3 rounded-md bg-[#F2F7F1] border border-[#C9E4CE] text-sm text-[#1F3A2E]">
+            🎉 Live at{" "}
+            <a href={liveUrl} target="_blank" rel="noreferrer" className="underline font-medium">
+              {liveUrl}
+            </a>
+            <div className="mt-3 flex items-center gap-3">
+              <img src={`${liveUrl}/qr.png`} alt="QR code" className="w-20 h-20 rounded border border-[#C9E4CE] bg-white" />
+              <a
+                href={`${liveUrl}/qr.png`}
+                download
+                className="text-xs underline text-[#1F3A2E]"
+              >
+                Download QR code
+              </a>
+            </div>
+          </div>
+        )}
+
+        {site && (
+          <div
+            className="rounded-lg overflow-hidden shadow-sm border border-[#E5DFD1]"
+            style={{ backgroundColor: mood.bg }}
+          >
+            {/* hero */}
+            <div className="px-10 py-16 text-center" style={{ color: mood.dark }}>
+              {heroImage && (
+                <img
+                  src={heroImage}
+                  alt={businessName}
+                  className="max-w-full mx-auto mb-5 rounded-lg"
+                  style={{ maxHeight: "220px", objectFit: "cover" }}
+                />
+              )}
+              <p
+                className="text-xs tracking-wide font-medium mb-3"
+                style={{ color: mood.accent }}
+              >
+                {businessName}
+              </p>
+              <EditableText
+                tag="h2"
+                style={{ fontFamily: "Georgia, serif" }}
+                className="text-3xl md:text-4xl font-normal mb-4"
+                value={site.tagline}
+                onChange={(v) => updateField("tagline", v)}
+              />
+              <EditableText
+                className="text-sm max-w-md mx-auto opacity-80"
+                value={site.hero_description}
+                onChange={(v) => updateField("hero_description", v)}
+              />
+              <button
+                className="mt-6 px-5 py-2 rounded-md text-sm font-medium text-white"
+                style={{ backgroundColor: mood.accent }}
+              >
+                <EditableText
+                  tag="span"
+                  className=""
+                  value={site.cta}
+                  onChange={(v) => updateField("cta", v)}
+                />
+              </button>
+            </div>
+
+            {/* services */}
+            <div className="px-10 py-10 bg-white/50">
+              <div className="grid grid-cols-1 sm:grid-cols-3 gap-6">
+                {site.services?.map((s, i) => (
+                  <div key={i} className="text-center">
+                    <EditableText
+                      tag="h3"
+                      style={{ color: mood.dark, fontFamily: "Georgia, serif" }}
+                      className="text-base mb-1"
+                      value={s.name}
+                      onChange={(v) => updateField(`service.${i}.name`, v)}
+                    />
+                    <EditableText
+                      tag="p"
+                      className="text-xs opacity-70"
+                      style={{ color: mood.dark }}
+                      value={s.desc}
+                      onChange={(v) => updateField(`service.${i}.desc`, v)}
+                    />
+                  </div>
+                ))}
+              </div>
+            </div>
+
+            {/* about */}
+            <div className="px-10 py-10 text-center" style={{ color: mood.dark }}>
+              <h3
+                style={{ fontFamily: "Georgia, serif" }}
+                className="text-xl mb-3"
+              >
+                About us
+              </h3>
+              <EditableText
+                className="text-sm max-w-lg mx-auto opacity-80"
+                value={site.about}
+                onChange={(v) => updateField("about", v)}
+              />
+            </div>
+
+            {/* contact */}
+            <div
+              className="px-10 py-8 text-center"
+              style={{ backgroundColor: mood.dark, color: mood.bg }}
+            >
+              <EditableText
+                tag="p"
+                className="text-sm"
+                value={site.contact_line}
+                onChange={(v) => updateField("contact_line", v)}
+              />
+            </div>
+          </div>
+        )}
+      </div>
+
+      {showMySites && (
+        <div className="fixed inset-0 bg-black/40 flex items-center justify-center p-4 z-50">
+          <div className="bg-white rounded-lg w-full max-w-md max-h-[80vh] overflow-y-auto">
+            <div className="flex items-center justify-between p-4 border-b border-[#E5DFD1] sticky top-0 bg-white">
+              <h2 className="font-semibold text-[#1F3A2E]">My Sites</h2>
+              <button onClick={() => setShowMySites(false)} className="text-sm text-[#A79E8C]">
+                Close
+              </button>
+            </div>
+            <div className="p-4 flex flex-col gap-3">
+              {loadingMySites && <p className="text-sm text-[#6B6455]">Loading...</p>}
+              {!loadingMySites && mySites.length === 0 && (
+                <p className="text-sm text-[#6B6455]">
+                  You haven't published any sites yet. Generate one and hit Publish!
+                </p>
+              )}
+              {mySites.map((s) => (
+                <div key={s.slug} className="border border-[#E5DFD1] rounded-md p-3 flex flex-col gap-2">
+                  <div>
+                    <p className="text-sm font-medium text-[#1F3A2E]">{s.businessName}</p>
+                    <a
+                      href={`${BACKEND_URL}/site/${s.slug}`}
+                      target="_blank"
+                      rel="noreferrer"
+                      className="text-xs text-[#6B5B95] underline break-all"
+                    >
+                      {BACKEND_URL}/site/{s.slug}
+                    </a>
+                  </div>
+                  <div className="flex gap-2">
+                    <button
+                      onClick={() => openSiteForEdit(s)}
+                      className="flex-1 py-1.5 text-xs rounded bg-[#1F3A2E] text-white font-medium"
+                    >
+                      Edit
+                    </button>
+                    <button
+                      onClick={() => openMessagesForSite(s.slug)}
+                      className="flex-1 py-1.5 text-xs rounded border border-[#1F3A2E] text-[#1F3A2E] font-medium"
+                    >
+                      Messages
+                    </button>
+                    <button
+                      onClick={() => deleteSite(s.slug)}
+                      disabled={deletingSlug === s.slug}
+                      className="flex-1 py-1.5 text-xs rounded border border-[#C9532F] text-[#C9532F] font-medium disabled:opacity-40"
+                    >
+                      {deletingSlug === s.slug ? "Deleting..." : "Delete"}
+                    </button>
+                  </div>
+                </div>
+              ))}
+            </div>
+          </div>
+        </div>
+      )}
+
+      {showMessages && (
+        <div className="fixed inset-0 bg-black/40 flex items-center justify-center p-4 z-50">
+          <div className="bg-white rounded-lg w-full max-w-md max-h-[80vh] overflow-y-auto">
+            <div className="flex items-center justify-between p-4 border-b border-[#E5DFD1] sticky top-0 bg-white">
+              <h2 className="font-semibold text-[#1F3A2E]">Messages</h2>
+              <button onClick={() => setShowMessages(false)} className="text-sm text-[#A79E8C]">
+                Close
+              </button>
+            </div>
+            <div className="p-4 flex flex-col gap-2">
+              {loadingMessages && <p className="text-sm text-[#6B6455]">Loading...</p>}
+              {!loadingMessages && messagesList.length === 0 && (
+                <p className="text-sm text-[#6B6455]">No messages yet.</p>
+              )}
+              {messagesList.map((m, i) => (
+                <div key={i} className="border border-[#E5DFD1] rounded-md p-3">
+                  <p className="text-sm font-medium text-[#1F3A2E]">{m.name}</p>
+                  {m.email && <p className="text-xs text-[#6B5B95]">{m.email}</p>}
+                  <p className="text-xs text-[#6B6455] mt-1">{m.message}</p>
+                  <p className="text-[10px] text-[#A79E8C] mt-1">{new Date(m.createdAt).toLocaleString()}</p>
+                </div>
+              ))}
+            </div>
+          </div>
+        </div>
+      )}
+    </div>
+  );
+}
+
+ReactDOM.createRoot(document.getElementById('root')).render(<AIWebsiteBuilder />);
+</script>
+</body>
+</html>
